@@ -1,20 +1,10 @@
-/* Custom Scrollbar Styles */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
+/* Hide scrollbar for webkit browsers */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #2d3748; /* Darker background */
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #4a5568; /* Gray thumb */
-  border-radius: 10px;
-  border: 2px solid #2d3748; /* Padding around the thumb */
-}
-
-/* For Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #4a5568 #2d3748;
+/* Hide scrollbar for Firefox */
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* Internet Explorer and Edge */
+  scrollbar-width: none; /* Firefox */
 }
