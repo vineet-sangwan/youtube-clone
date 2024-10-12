@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Cookies from "js-cookie"; // Import js-cookie
 import { IoMenuOutline, IoSearchOutline } from "react-icons/io5";
 import { AiOutlineYoutube } from "react-icons/ai";
 import { MdOutlineKeyboardVoice } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import unknownUser from "../images/user.jpg";
+import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
+import { signOutUser, clearUserInfo } from "../Redux/userSlice"; // Import logout action
+import { checkAuth } from "../Redux/userSlice";
 
 const Navbar = ({ toggleSidebar }) => {
   const [userPic] = useState(unknownUser);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Access user information from Redux store
+  const dispatch = useDispatch();
+  const { userInfo, isLoading } = useSelector((state) => state.user); // Use useSelector to get user info
+
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  if (isLoading) return <div>Loading...</div>;
+
+  const handleLogout = async () => {
+    await dispatch(signOutUser()); // Dispatch logout action
+    dispatch(clearUserInfo()); // Clear user info from state
+    Cookies.remove("token"); // Remove token from cookies
+  };
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -36,13 +56,14 @@ const Navbar = ({ toggleSidebar }) => {
         <div className="text-gray-700 cursor-pointer" onClick={toggleSidebar}>
           <IoMenuOutline size={30} />
         </div>
-
-        <div className="flex items-center ml-4">
-          <AiOutlineYoutube className="text-red-600" size={40} />
-          <span className="text-xl font-semibold ml-2">
-            Youtube<sup>NL</sup>
-          </span>
-        </div>
+        <Link to="/">
+          <div className="flex items-center ml-4">
+            <AiOutlineYoutube className="text-red-600" size={40} />
+            <span className="text-xl font-semibold ml-2">
+              Youtube<sup>NL</sup>
+            </span>
+          </div>
+        </Link>
       </div>
 
       {/* Center - Search bar */}
@@ -90,21 +111,33 @@ const Navbar = ({ toggleSidebar }) => {
 
         {dropdownOpen && (
           <div className="absolute top-12 right-0 w-40 bg-white shadow-lg rounded-lg p-2 ">
-            {!loggedIn ? (
+            {!userInfo ? ( // Check if userInfo is available
               <>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                  Profile
-                </button>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                  Login
-                </button>
+                <Link to="/login">
+                  <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
+                    Login
+                  </button>
+                </Link>
+                <Link to="/signup">
+                  <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
+                    Sign Up
+                  </button>
+                </Link>
               </>
             ) : (
               <>
+                <Link to="/channel">
+                  <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
+                    Profile
+                  </button>
+                </Link>
                 <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                  John Doe
+                  {userInfo.user.name || "User"} {/* Display username */}
                 </button>
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200"
+                  onClick={handleLogout}
+                >
                   Logout
                 </button>
               </>
@@ -140,12 +173,34 @@ const Navbar = ({ toggleSidebar }) => {
               </div>
 
               <div className="flex flex-col w-full space-y-2">
-                <button className="w-full px-4 py-2 text-gray rounded-md ">
-                  Profile
-                </button>
-                <button className="w-full px-4 py-2 text-gray rounded-md ">
-                  Login
-                </button>
+                {!userInfo ? (
+                  <>
+                    <Link to="/login">
+                      <button className="w-full px-4 py-2 text-gray rounded-md ">
+                        Login
+                      </button>
+                    </Link>
+                    <Link to="/signup">
+                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
+                        Sign Up
+                      </button>
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/channel">
+                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
+                        Profile
+                      </button>
+                    </Link>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -17,6 +17,18 @@ export const signup = async (req, res, next) => {
   }
 };
 
+// controllers/authController.js
+export const checkAuth = (req, res) => {
+  const user = req.user; // req.user is set by authenticateToken middleware
+
+  if (!user) {
+    return res.status(401).json({ message: 'User not authenticated' });
+  }
+
+  res.status(200).json({ success: true, user });
+};
+
+
 export const signin = async (req, res, next) => {
   try {
     const user = await User.findOne({ name: req.body.name });
@@ -35,6 +47,17 @@ export const signin = async (req, res, next) => {
       })
       .status(200)
       .json(others);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    // Clear the cookie by setting it to an empty value and expiring it
+    res.clearCookie("access_token");
+    
+    res.status(200).json({ message: "User has been logged out!" });
   } catch (err) {
     next(err);
   }

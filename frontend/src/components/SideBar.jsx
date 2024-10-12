@@ -11,6 +11,7 @@ import {
 import { FaMoon, FaQuestionCircle } from "react-icons/fa";
 import { GrChannel } from "react-icons/gr";
 import { RiPlayList2Fill } from "react-icons/ri";
+import { Link } from "react-router-dom";
 
 const SideBar = ({ isOpen }) => {
   return (
@@ -21,12 +22,16 @@ const SideBar = ({ isOpen }) => {
     >
       {/* Top Navigation */}
       <div className="space-y-2 flex flex-col">
-        <SidebarOption Icon={IoHomeOutline} label="Home" isOpen={isOpen} />
-        <SidebarOption
-          Icon={IoVideocamOutline}
-          label="Shorts"
-          isOpen={isOpen}
-        />
+        <Link to="/">
+          <SidebarOption Icon={IoHomeOutline} label="Home" isOpen={isOpen} />
+        </Link>
+        <Link to="/video">
+          <SidebarOption
+            Icon={IoVideocamOutline}
+            label="Shorts"
+            isOpen={isOpen}
+          />
+        </Link>
         <SidebarOption
           Icon={MdOutlineSubscriptions}
           label="Subscriptions"

@@ -1,0 +1,137 @@
+export const videos = [
+  {
+    id: 1,
+    title: "React JS Tutorial",
+    views: "2M views",
+    timestamp: "2 days ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1593642632793-7b43878e84a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDd8fHJlYWN0JTIwanMlMjB0dXRvcmlhbHxlbnwwfHx8fDE2MDc4MDcwNzY&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "John Doe",
+    uploaderAvatar: "https://randomuser.me/api/portraits/men/1.jpg",
+  },
+  {
+    id: 2,
+    title: "Frontend Interview Experience",
+    views: "8.5K views",
+    timestamp: "9 days ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1599040570287-330d6b6490b6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEwfHxmcm9udGVuZCUyMGVudGFyeXxlbnwwfHx8fDE2MDc4MDcwNzc&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Jane Smith",
+    uploaderAvatar: "https://randomuser.me/api/portraits/women/1.jpg",
+  },
+  {
+    id: 3,
+    title: "Understanding JavaScript Closures",
+    views: "1.3M views",
+    timestamp: "3 weeks ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1508245109625-5b224fb15e05?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEwfHxqc3R8ZW58MHx8fHwxNjA3ODAwNzgy&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Mike Johnson",
+    uploaderAvatar: "https://randomuser.me/api/portraits/men/2.jpg",
+  },
+  {
+    id: 4,
+    title: "CSS Flexbox Tutorial",
+    views: "500K views",
+    timestamp: "1 week ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1579153515792-9f66f4e0a09f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDI2fHxjc3N8ZW58MHx8fHwxNjA3ODAwNzgz&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Emily Davis",
+    uploaderAvatar: "https://randomuser.me/api/portraits/women/2.jpg",
+  },
+  {
+    id: 5,
+    title: "Building Responsive Websites",
+    views: "750K views",
+    timestamp: "2 weeks ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1559529428-4d5e4aa64653?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDE2fHxyZXNwb25zaXZlJTIwd2Vic2l0ZXxlbnwwfHx8fDE2MDc4MDA3ODQ&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Chris Lee",
+    uploaderAvatar: "https://randomuser.me/api/portraits/men/3.jpg",
+  },
+  {
+    id: 6,
+    title: "Node.js for Beginners",
+    views: "1.1M views",
+    timestamp: "4 days ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1593642632793-7b43878e84a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDI3fHxuYWRlJTIwanN8ZW58MHx8fHwxNjA3ODAwNzg2&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Sophia Brown",
+    uploaderAvatar: "https://randomuser.me/api/portraits/women/3.jpg",
+  },
+  {
+    id: 7,
+    title: "A Guide to Web Accessibility",
+    views: "300K views",
+    timestamp: "10 days ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDJ8fHd8ZW58MHx8fHwxNjA3ODAwNzg5&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "William Taylor",
+    uploaderAvatar: "https://randomuser.me/api/portraits/men/4.jpg",
+  },
+  {
+    id: 8,
+    title: "10 Tips for Better UX Design",
+    views: "650K views",
+    timestamp: "5 days ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1593642632793-7b43878e84a6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDJ8fHh8ZW58MHx8fHwxNjA3ODAwODAw&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Olivia Wilson",
+    uploaderAvatar: "https://randomuser.me/api/portraits/women/4.jpg",
+  },
+  {
+    id: 9,
+    title: "Introduction to TypeScript",
+    views: "900K views",
+    timestamp: "1 month ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1621374115055-df09f9352c2f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDE0fHx0eXBlJTIwc2NyaXB0fGVufDB8fHx8MTYwNzgxMDA4NA&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "James Anderson",
+    uploaderAvatar: "https://randomuser.me/api/portraits/men/5.jpg",
+  },
+  {
+    id: 10,
+    title: "Exploring GraphQL",
+    views: "450K views",
+    timestamp: "2 weeks ago",
+    thumbnail:
+      "https://images.unsplash.com/photo-1615886555090-44b686b3eb85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDF8fGdyYXBocXF8ZW58MHx8fHwxNjA3ODAwODQw&ixlib=rb-1.2.1&q=80&w=400",
+    uploader: "Isabella Martinez",
+    uploaderAvatar: "https://randomuser.me/api/portraits/women/5.jpg",
+  },
+];
+
+export   // Video categories (tags)
+const videoTags = [
+  "All",
+  "Music",
+  "Sports",
+  "Gaming",
+  "News",
+  "Technology",
+  "Education",
+  "Health",
+  "Travel",
+  "Food",
+  "DIY",
+  "Fashion",
+  "Science",
+  "Vlogs",
+  "Comedy",
+  "Motivational",
+  "Fitness",
+  "Animals",
+  "Nature",
+  "Art",
+  "Documentary",
+  "Short Films",
+  "Reviews",
+  "Tutorials",
+  "Lifestyle",
+  "Photography",
+  "Parenting",
+  "Politics",
+  "Finance",
+  "Culture",
+  "Self-Improvement",
+];

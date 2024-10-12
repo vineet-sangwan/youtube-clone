@@ -3,15 +3,15 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import userRoutes from './routes/users.js'; 
 import videoRoutes from './routes/videos.js'; 
-import commentRoutes from './routes/comments.js' ;
+import commentRoutes from './routes/comments.js';
 import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
-
+import cors from 'cors'; // Import cors
 
 const app = express();
 dotenv.config();
 
-// Database connection function
+// Connect to MongoDB
 const connect = () => {
   mongoose.connect(process.env.MONGO_URI)
     .then(() => {
@@ -19,28 +19,39 @@ const connect = () => {
     })
     .catch((err) => {
       console.error('Error connecting to Database:', err.message);
-      process.exit(1);  // Exit if the connection fails
+      process.exit(1); 
     });
 };
 
-// Use the user routes
-app.use(cookieParser())
-app.use(express.json())
+// Middleware
+app.use(cookieParser());
+app.use(express.json());
+
+// Enable CORS
+app.use(cors({
+  origin: 'http://localhost:5173', // Update the origin to match your frontend's URL
+  credentials: true // Allow cookies to be sent
+}));
+
+// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/video', videoRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/comments',commentRoutes);
+app.use('/api/comments', commentRoutes);
 
-app.use((err,req,res,next)=>{
+// Error handling middleware
+app.use((err, req, res, next) => {
   const status = err.status || 500;
-  const message = err.message || "something went wrong!";
+  const message = err.message || "Something went wrong!";
   return res.status(status).json({
-    success:false,status,message
-  })
-})
+    success: false,
+    status,
+    message
+  });
+});
 
-// Start the server
+// Start server
 app.listen(3000, () => {
-  connect();  // Connect to the database before the server starts listening
+  connect(); 
   console.log('Server running on port 3000');
 });

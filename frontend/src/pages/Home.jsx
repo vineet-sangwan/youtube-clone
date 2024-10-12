@@ -1,93 +1,36 @@
-import React, { useState } from "react";
-import SideBar from "../components/SideBar"; // Sidebar component you already created
-import Filter from "../components/Filter"; // Filter (categories) component
-import Navbar from "../components/Navbar"; // Navbar component
+import React, { useEffect } from "react";
+import Filter from "../components/Filter";
+import VideoCard from "../components/Card";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchRandomVideos } from "../Redux/videoSlice";
+import { videoTags } from "../../Utils/Dummy";
 
 const Home = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
-  // Toggle function for sidebar
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  // Video categories (tags)
-  const videoTags = [
-    "All",
-    "Music",
-    "Sports",
-    "Gaming",
-    "News",
-    "Technology",
-    "Education",
-    "Health",
-    "Travel",
-    "Food",
-    "DIY",
-    "Fashion",
-    "Science",
-    "Vlogs",
-    "Comedy",
-    "Motivational",
-    "Fitness",
-    "Animals",
-    "Nature",
-    "Art",
-    "Documentary",
-    "Short Films",
-    "Reviews",
-    "Tutorials",
-    "Lifestyle",
-    "Photography",
-    "Parenting",
-    "Politics",
-    "Finance",
-    "Culture",
-    "Self-Improvement",
-  ];
+  const dispatch = useDispatch();
+  const { videos, isLoading, error } = useSelector((state) => state.videos); // Access video data from the Redux store
+  // Fetch subscribed videos on component mount
+  useEffect(() => {
+    dispatch(fetchRandomVideos());
+  }, [dispatch]);
 
   return (
-    <div className="flex flex-col h-screen">
-      {/* Navbar at the top */}
-      <Navbar toggleSidebar={toggleSidebar} />
-
-      {/* Main content area with Sidebar and Videos */}
-      <div className="flex flex-grow mt-16 overflow-hidden">
-        {/* Sidebar with dynamic width */}
-        <div
-          className={`transition-all duration-300 ${
-            sidebarOpen ? "w-56" : "w-16"
-          }`}
-        >
-          <SideBar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
-        </div>
-
-        {/* Main content area */}
-        <div
-          className={`flex-grow p-4 transition-all duration-300 ${
-            sidebarOpen ? "ml-52 lg:ml-32" : "ml-16 lg:ml-8"
-          } overflow-auto`}
-        >
-          {/* Filter component (Tags) */}
-          <div className="mb-4">
-            <Filter tags={videoTags} />
-          </div>
-
-          {/* Video Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {/* Video Cards */}
-            {Array.from({ length: 8 }, (_, index) => (
-              <div
-                key={index}
-                className="bg-gray-200 p-6 rounded-md shadow-md hover:shadow-lg transition-shadow duration-200"
-              >
-                Video Card {index + 1}
-              </div>
-            ))}
-          </div>
-        </div>
+    <main className="flex flex-col h-screen bg-gray-50 p-6">
+      {/* Filter section */}
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold mb-2">Filter by Tags</h2>
+        <Filter tags={videoTags} />
       </div>
-    </div>
+
+      {/* Loading and Error handling */}
+      {isLoading && <p>Loading videos...</p>}
+      {error && <p className="text-red-500">Error: {error}</p>}
+
+      {/* Video Cards */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
+        {videos &&
+          videos.map((video) => <VideoCard key={video._id} video={video} />)}
+      </section>
+    </main>
   );
 };
 
