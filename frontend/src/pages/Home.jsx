@@ -32,8 +32,13 @@ const Home = ({ type }) => {
   // Determine which videos to display
   const videosToDisplay = type === "Subscriptions" ? subscribedVideos : videos;
 
+  // Conditional class for ml-10 based on type
+  const containerClass = `flex flex-col h-screen bg-gray-50 p-6 ${
+    type === "trend" || type === "Subscriptions" ? "ml-10" : ""
+  }`;
+
   return (
-    <main className="flex flex-col h-screen bg-gray-50 p-6">
+    <main className={containerClass}>
       {/* Filter section */}
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Filter by Tags</h2>
