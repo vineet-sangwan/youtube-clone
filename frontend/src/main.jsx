@@ -17,8 +17,16 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/", // Set this to "/" to render Home at the base URL
-        element: <Home />,
+        index: true, // Default route at "/"
+        element: <Home type="random" />, // Random videos at the base path
+      },
+      {
+        path: "trend", // Route for trending videos
+        element: <Home type="trend" />,
+      },
+      {
+        path: "Subscriptions", // Route for subscribed videos
+        element: <Home type="Subscriptions" />,
       },
       {
         path: "/video/:id",

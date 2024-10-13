@@ -25,18 +25,20 @@ const SideBar = ({ isOpen }) => {
         <Link to="/">
           <SidebarOption Icon={IoHomeOutline} label="Home" isOpen={isOpen} />
         </Link>
-        <Link to="/video">
+        <Link to="/trend">
           <SidebarOption
             Icon={IoVideocamOutline}
-            label="Shorts"
+            label="Trending"
             isOpen={isOpen}
           />
         </Link>
-        <SidebarOption
-          Icon={MdOutlineSubscriptions}
-          label="Subscriptions"
-          isOpen={isOpen}
-        />
+        <Link to="/Subscriptions">
+          <SidebarOption
+            Icon={MdOutlineSubscriptions}
+            label="Subscriptions"
+            isOpen={isOpen}
+          />
+        </Link>
       </div>
 
       <hr className="border-gray-300 my-2" />

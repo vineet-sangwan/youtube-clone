@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
+import Cookies from 'js-cookie'; // Import js-cookie
 // Thunks for asynchronous actions
 
 // Add a new video
@@ -26,7 +26,7 @@ export const updateVideo = createAsyncThunk('videos/updateVideo', async ({ id, v
 // Delete a video
 export const deleteVideo = createAsyncThunk('videos/deleteVideo', async (id, { rejectWithValue }) => {
   try {
-    const response = await axios.delete(`http://localhost:3000/api/video/${id}`);
+    await axios.delete(`http://localhost:3000/api/video/${id}`);
     return id; // Return the video id that was deleted
   } catch (err) {
     return rejectWithValue(err.response.data);
@@ -47,7 +47,6 @@ export const getVideo = createAsyncThunk('videos/getVideo', async (id, { rejectW
 export const fetchRandomVideos = createAsyncThunk('videos/fetchRandomVideos', async (_, { rejectWithValue }) => {
   try {
     const response = await axios.get('http://localhost:3000/api/video/random');
-     console.log(response)
     return response.data;
   } catch (err) {
     return rejectWithValue(err.response.data);
@@ -64,22 +63,26 @@ export const fetchTrendingVideos = createAsyncThunk('videos/fetchTrendingVideos'
   }
 });
 
-// Fetch videos from subscribed channels
+// Async thunk for fetching videos from subscribed channels
 export const fetchSubscribedVideos = createAsyncThunk(
   'videos/fetchSubscribedVideos',
   async (_, { rejectWithValue }) => {
-    try {
-      const token = Cookies.get('token'); // Get the token from cookies
+    const token = Cookies.get('token'); // Retrieve token from cookies
+    console.log('Retrieved Token:', token); // Log the token to see if it’s undefined
+    console.log(document.cookie)
+    if (!token) {
+      console.error('Token is not available.');
+      return rejectWithValue('Token is not available');
+    }
 
+    try {
       const response = await axios.get('http://localhost:3000/api/video/sub', {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
-        },
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true, // Ensure cookies are sent with requests
       });
-      
-      return response.data; // Return the subscribed videos data
+      return response.data;
     } catch (err) {
-      return rejectWithValue(err.response.data); // Return the error message
+      return rejectWithValue(err.response.data);
     }
   }
 );
@@ -108,6 +111,7 @@ export const searchVideos = createAsyncThunk('videos/searchVideos', async (query
 const initialState = {
   videos: [],
   isLoading: false,
+  loading: false,
   error: null,
 };
 
@@ -171,7 +175,7 @@ const videoSlice = createSlice({
       })
       .addCase(getVideo.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.video = action.payload;
+        state.video = action.payload; // Make sure to declare `video` in your initialState if you use it.
       })
       .addCase(getVideo.rejected, (state, action) => {
         state.isLoading = false;
@@ -209,15 +213,16 @@ const videoSlice = createSlice({
     // Fetch subscribed videos
     builder
       .addCase(fetchSubscribedVideos.pending, (state) => {
-        state.isLoading = true;
+        state.loading = true;
+        state.error = null;
       })
       .addCase(fetchSubscribedVideos.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.videos = action.payload;
+        state.loading = false;
+        state.subscribedVideos = action.payload;
       })
       .addCase(fetchSubscribedVideos.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
+        state.loading = false;
+        state.error = action.payload; // Handle the error message from the rejected value
       });
 
     // Fetch videos by tag

@@ -86,20 +86,30 @@ export const trend = async (req, res, next) => {
   }
 };
 
+
 export const sub = async (req, res, next) => {
   try {
+    // Find user by ID from the request
     const user = await User.findById(req.user.id);
+    if (!user) return next(createError(404, "User not found!")); // Check if user exists
+
+    // Get subscribed channel IDs
     const subscribedChannels = user.subscribedUsers;
 
+    // Fetch videos for each subscribed channel
     const list = await Promise.all(
       subscribedChannels.map(async (channelId) => {
         return await Video.find({ userId: channelId });
       })
     );
 
-    res.status(200).json(list.flat().sort((a, b) => b.createdAt - a.createdAt));
+    // Flatten the array and sort it by creation date
+    const sortedVideos = list.flat().sort((a, b) => b.createdAt - a.createdAt);
+
+    // Respond with the sorted videos
+    res.status(200).json(sortedVideos);
   } catch (err) {
-    next(err);
+    next(err); // Pass errors to the error handling middleware
   }
 };
 

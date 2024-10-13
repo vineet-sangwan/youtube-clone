@@ -31,31 +31,41 @@ export const checkAuth = (req, res) => {
 
 export const signin = async (req, res, next) => {
   try {
+    // Find the user by username (or email)
     const user = await User.findOne({ name: req.body.name });
     if (!user) return next(createError(404, "User not found!"));
 
+    // Compare provided password with the hashed password in the database
     const isCorrect = await bcrypt.compare(req.body.password, user.password);
-
     if (!isCorrect) return next(createError(400, "Wrong Credentials!"));
 
-    const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+    // Create a JWT token
+    const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+      expiresIn: '1h', // Optional: Set token expiration time
+    });
+
+    // Exclude password from the user object
     const { password, ...others } = user._doc;
 
+    // Set the cookie with the token and return the user info
     res
-      .cookie("access_token", token, {
-        httpOnly: true,
+      .cookie("token", token, {
+        httpOnly: false, // Prevents client-side JavaScript from accessing the cookie
+        secure: process.env.NODE_ENV === 'production', // Sends cookie only over HTTPS in production
+        sameSite: 'Strict', // Controls cookie behavior for cross-site requests
+        expires: new Date(Date.now() + 3600000) // Sets cookie expiration (1 hour)
       })
       .status(200)
       .json(others);
   } catch (err) {
-    next(err);
+    next(err); // Pass the error to the error handler middleware
   }
 };
 
 export const logout = async (req, res, next) => {
   try {
     // Clear the cookie by setting it to an empty value and expiring it
-    res.clearCookie("access_token");
+    res.clearCookie("token");
     
     res.status(200).json({ message: "User has been logged out!" });
   } catch (err) {
