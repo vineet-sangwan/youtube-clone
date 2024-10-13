@@ -34,13 +34,9 @@ export const deleteVideo = createAsyncThunk('videos/deleteVideo', async (id, { r
 });
 
 // Get a single video
-export const getVideo = createAsyncThunk('videos/getVideo', async (id, { rejectWithValue }) => {
-  try {
-    const response = await axios.get(`http://localhost:3000/api/video/${id}`);
-    return response.data;
-  } catch (err) {
-    return rejectWithValue(err.response.data);
-  }
+export const getVideo = createAsyncThunk("videos/getVideo", async (id) => {
+  const response = await axios.get(`http://localhost:3000/api/video/find/${id}`); // Adjust the endpoint as needed
+  return response.data; // Ensure this matches the structure you expect
 });
 
 // Fetch random videos
@@ -110,6 +106,7 @@ export const searchVideos = createAsyncThunk('videos/searchVideos', async (query
 // Initial state
 const initialState = {
   videos: [],
+  currentVideo: null,
   isLoading: false,
   loading: false,
   error: null,
@@ -123,6 +120,19 @@ const videoSlice = createSlice({
     // You can add synchronous reducers if needed
   },
   extraReducers: (builder) => {
+    // Get video 
+    builder
+    .addCase(getVideo.pending, (state) => {
+      state.loading = true;
+    })
+    .addCase(getVideo.fulfilled, (state, action) => {
+      state.loading = false;
+      state.currentVideo = action.payload; // Ensure this matches the API response
+    })
+    .addCase(getVideo.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.error.message;
+    })
     // Add video
     builder
       .addCase(addVideo.pending, (state) => {
@@ -164,20 +174,6 @@ const videoSlice = createSlice({
         state.videos = state.videos.filter((video) => video.id !== action.payload);
       })
       .addCase(deleteVideo.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
-
-    // Get video
-    builder
-      .addCase(getVideo.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getVideo.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.video = action.payload; // Make sure to declare `video` in your initialState if you use it.
-      })
-      .addCase(getVideo.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
