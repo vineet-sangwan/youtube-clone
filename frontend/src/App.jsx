@@ -33,10 +33,10 @@ const App = () => {
         <div
           className={`flex-grow transition-all duration-300  ${
             sidebarOpen
-              ? "ml-2 lg:ml-4 lg:mt-4"
+              ? "ml-2 lg:ml-1 lg:mt-4"
               : isHomePage
-              ? "ml-12 lg:ml-8"
-              : "ml-1 lg:ml-0 mt-2"
+              ? " lg:ml-1"
+              : " mt-2"
           } overflow-auto`}
         >
           <Outlet /> {/* This renders the specific route content */}

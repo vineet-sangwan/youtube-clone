@@ -6,15 +6,15 @@ import {
   fetchRandomVideos,
   fetchSubscribedVideos,
   fetchTrendingVideos,
+  fetchVideosByTag, // Import the new action
 } from "../Redux/videoSlice";
-import { videoTags } from "../../Utils/Dummy";
 
 const Home = ({ type }) => {
   const dispatch = useDispatch();
   const {
     videos = [],
     subscribedVideos = [],
-    searchResults = [], // Access search results from Redux
+    searchResults = [],
     isLoading,
     error,
   } = useSelector((state) => state.videos);
@@ -38,24 +38,41 @@ const Home = ({ type }) => {
       ? subscribedVideos
       : videos;
 
-  // Conditional class for ml-10 based on type
-  const containerClass = `flex flex-col h-screen bg-gray-50 p-6 ${
-    type === "trend" || type === "Subscriptions" ? "ml-8" : ""
+  // Extract unique tags from the videos to display
+  const allTags = videosToDisplay.reduce((acc, video) => {
+    video.tags.forEach((tag) => {
+      acc.add(tag.trim());
+    });
+    return acc;
+  }, new Set());
+
+  // Convert Set back to array for the Filter component
+  const uniqueTags = Array.from(allTags);
+
+  // Conditional class for alignment based on type
+  const containerClass = `flex flex-col h-screen bg-gray-50 p-4 md:p-6 lg:p-8 ${
+    type === "trend" || type === "Subscriptions" ? "ml-1" : ""
   }`;
+
+  // Handle tag click to fetch videos by the selected tag
+  const handleTagClick = (tag) => {
+    dispatch(fetchVideosByTag(tag)); // Dispatch action to fetch videos by tag
+  };
 
   return (
     <main className={containerClass}>
       {/* Filter section */}
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Filter by Tags</h2>
-        <Filter tags={videoTags} />
+        <Filter tags={uniqueTags} onTagClick={handleTagClick} />{" "}
+        {/* Pass the handler */}
       </div>
 
       {/* Loading and Error handling */}
-      {isLoading && <p>Loading videos...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
+      {isLoading && <p className="text-center">Loading videos...</p>}
+      {error && <p className="text-red-500 text-center">Error: {error}</p>}
       {!isLoading && !error && videosToDisplay.length === 0 && (
-        <p>No videos available.</p>
+        <p className="text-center">No videos available.</p>
       )}
 
       {/* Video Cards */}
