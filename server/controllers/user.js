@@ -45,17 +45,30 @@ export const getUser = async (req, res, next) => {
 
 export const subscribe = async (req, res, next) => {
   try {
+    // Find the current user
+    const user = await User.findById(req.user.id);
+
+    // Check if the user has already subscribed to the channel
+    if (user.subscribedUsers.includes(req.params.id)) {
+      return res.status(400).json("You have already subscribed to this channel.");
+    }
+
+    // If not subscribed, add the subscription
     await User.findByIdAndUpdate(req.user.id, {
       $push: { subscribedUsers: req.params.id },
     });
+
+    // Increment the subscriber count of the channel
     await User.findByIdAndUpdate(req.params.id, {
       $inc: { subscribers: 1 },
     });
-    res.status(200).json("Subscription successfull.")
+
+    res.status(200).json("Subscription successful.");
   } catch (err) {
     next(err);
   }
 };
+
 
 export const unsubscribe = async (req, res, next) => {
   try {
@@ -74,6 +87,25 @@ export const unsubscribe = async (req, res, next) => {
     next(err);
   }
 };
+
+export const isSubscribed = async (req, res, next) => {
+  try {
+    // Find the current user
+    const user = await User.findById(req.user.id);
+
+    // Check if the user is subscribed to the channel (given by req.params.id)
+    const isSubscribed = user.subscribedUsers.includes(req.params.id);
+
+    if (isSubscribed) {
+      res.status(200).json({ subscribed: true });
+    } else {
+      res.status(200).json({ subscribed: false });
+    }
+  } catch (err) {
+    next(err); // Pass the error to the global error handler
+  }
+};
+
 
 export const like = async (req, res, next) => {
   const id = req.user.id;

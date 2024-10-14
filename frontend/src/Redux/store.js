@@ -2,12 +2,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
 import videoReducer from './videoSlice';
+import videoInfoReducer from './userInfo';
+import commentReducer from './commentSlice';
 
 const store = configureStore({
   reducer: {
     user: userReducer,
     videos: videoReducer,
-    userInfo: userReducer,
+    videoInfo: videoInfoReducer,
+    comments: commentReducer,
   },
 });
 

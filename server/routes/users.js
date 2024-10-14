@@ -7,6 +7,7 @@ import {
   unsubscribe,
   like,
   dislike,
+  isSubscribed,
 } from "../controllers/user.js";
 import { verifyToken } from "../middlewares/verfiy.js";
 
@@ -26,6 +27,9 @@ router.put("/sub/:id", verifyToken, subscribe);
 
 //unsubscribe a user
 router.put("/unsub/:id", verifyToken, unsubscribe);
+
+// check user is subscribe or not 
+router.get('/isSubscribed/:id', verifyToken, isSubscribed);
 
 //like a video
 router.put("/like/:videoId", verifyToken, like);

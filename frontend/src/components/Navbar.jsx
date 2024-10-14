@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
 import { signOutUser, clearUserInfo } from "../Redux/userSlice"; // Import logout action
 import { checkAuth } from "../Redux/userSlice";
+import { searchVideos } from "../Redux/videoSlice";
 
 const Navbar = ({ toggleSidebar }) => {
   const [userPic] = useState(unknownUser);
@@ -43,7 +44,7 @@ const Navbar = ({ toggleSidebar }) => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      console.log("Search term:", searchTerm);
+      dispatch(searchVideos(searchTerm)); // Dispatch search action
     } else {
       alert("Please enter a search term");
     }
@@ -152,6 +153,8 @@ const Navbar = ({ toggleSidebar }) => {
                 <input
                   type="text"
                   placeholder="Search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-l-full w-full focus:outline-none focus:ring focus:ring-red-300"
                 />
                 <button className="bg-gray-100 p-2 rounded-r-full hover:bg-gray-200 transition duration-200">

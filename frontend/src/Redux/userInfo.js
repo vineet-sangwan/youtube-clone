@@ -2,169 +2,192 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-// Function to get authentication headers
-const getAuthHeaders = () => {
-  const token = Cookies.get('token'); // Assuming your token is stored in a cookie named 'token'
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
-
-// Async thunks for user operations
-export const updateUser = createAsyncThunk(
-  'user/update',
-  async ({ id, data }, { rejectWithValue }) => {
-    try {
-      const headers = getAuthHeaders();
-      const response = await axios.put(`http://localhost:3000/api/users/${id}`, data, { headers });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const deleteUser = createAsyncThunk(
-  'user/delete',
-  async (id, { rejectWithValue }) => {
-    try {
-      const headers = getAuthHeaders();
-      await axios.delete(`http://localhost:3000/api/users/${id}`, { headers });
-      return id; // return id for deletion
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const subscribe = createAsyncThunk(
-  'user/subscribe',
-  async (userId, { rejectWithValue }) => {
-    try {
-      const headers = getAuthHeaders();
-      const response = await axios.put(`http://localhost:3000/api/users/sub/${userId}`, {}, { headers });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const unsubscribe = createAsyncThunk(
-  'user/unsubscribe',
-  async (userId, { rejectWithValue }) => {
-    try {
-      const headers = getAuthHeaders();
-      const response = await axios.put(`http://localhost:3000/api/users/unsubscribe/${userId}`, {}, { headers });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const likeVideo = createAsyncThunk(
-  'user/likeVideo',
-  async (videoId, { rejectWithValue }) => {
-    try {
-      const headers = getAuthHeaders();
-      const response = await axios.put(`http://localhost:3000/api/users/like/${videoId}`, {}, { headers });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const dislikeVideo = createAsyncThunk(
-  'user/dislikeVideo',
-  async (videoId, { rejectWithValue }) => {
-    try {
-      const headers = getAuthHeaders();
-      const response = await axios.put(`http://localhost:3000/api/users/dislike/${videoId}`, {}, { headers });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
-    }
-  }
-);
-
-// Fetch user data without authentication
+// Async thunk for getting user information
 export const getUser = createAsyncThunk(
   'user/getUser',
   async (userId, { rejectWithValue }) => {
+    console.log('Fetching user with ID:', userId);
+
     try {
-      const response = await axios.get(`http://localhost:3000/api/users/${userId}`, {
-        withCredentials: true, // Include cookies with the request
+      const response = await axios.get(`http://localhost:3000/api/users/find/${userId}`, {
+        withCredentials: true,
       });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
+      return response.data; // Return the user data
+    } catch (err) {
+      const errorMsg = err.response?.data || 'Something went wrong';
+      return rejectWithValue(errorMsg);
     }
   }
 );
 
-// Slice
-const userInfoSlice = createSlice({
-  name: 'user',
+// Async thunk for liking a video
+export const likeVideo = createAsyncThunk(
+  'video/likeVideo',
+  async (videoId, { rejectWithValue }) => {
+    console.log('Liking video with ID:', videoId);
+    const token = Cookies.get('token');
+
+    if (!token) {
+      console.error('Token is not available.');
+      return rejectWithValue('Token is not available');
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:3000/api/users/like/${videoId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      return response.data; // Return the updated video data
+    } catch (err) {
+      const errorMsg = err.response?.data || 'Something went wrong';
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+// Async thunk for disliking a video
+export const dislikeVideo = createAsyncThunk(
+  'video/dislikeVideo',
+  async (videoId, { rejectWithValue }) => {
+    console.log('Disliking video with ID:', videoId);
+    const token = Cookies.get('token');
+
+    if (!token) {
+      console.error('Token is not available.');
+      return rejectWithValue('Token is not available');
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:3000/api/users/dislike/${videoId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      return response.data; // Return the updated video data
+    } catch (err) {
+      const errorMsg = err.response?.data || 'Something went wrong';
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+// Async thunk for subscribing to a video
+export const subscribeToVideo = createAsyncThunk(
+  'video/subscribeToVideo',
+  async (userId, { rejectWithValue }) => {
+    console.log('Subscribing to user with ID:', userId);
+    const token = Cookies.get('token');
+
+    if (!token) {
+      console.error('Token is not available.');
+      return rejectWithValue('Token is not available');
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:3000/api/users/sub/${userId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      return response.data; // Return the updated subscription data
+    } catch (err) {
+      const errorMsg = err.response?.data || 'Something went wrong';
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+// Async thunk for unsubscribing from a video
+export const unsubscribeFromVideo = createAsyncThunk(
+  'video/unsubscribeFromVideo',
+  async (videoId, { rejectWithValue }) => {
+    console.log('Unsubscribing from video with ID:', videoId);
+    const token = Cookies.get('token');
+
+    if (!token) {
+      console.error('Token is not available.');
+      return rejectWithValue('Token is not available');
+    }
+
+    try {
+      const response = await axios.put(`http://localhost:3000/api/users/unsub/${videoId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      return response.data; // Return the updated subscription data
+    } catch (err) {
+      const errorMsg = err.response?.data || 'Something went wrong';
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+// Async thunk to check if the user is subscribed to a video/channel
+export const checkSubscription = createAsyncThunk(
+  'video/checkSubscription',
+  async (videoId, { rejectWithValue }) => {
+    console.log('Checking subscription for video with ID:', videoId);
+    const token = Cookies.get('token');
+
+    if (!token) {
+      console.error('Token is not available.');
+      return rejectWithValue('Token is not available');
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:3000/api/users/isSubscribed/${videoId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+      return response.data; // Return the subscription status (true/false)
+    } catch (err) {
+      const errorMsg = err.response?.data || 'Something went wrong';
+      return rejectWithValue(errorMsg);
+    }
+  }
+);
+
+// Video Info Slice
+const videoInfoSlice = createSlice({
+  name: 'videoInfo',
   initialState: {
-    userInfo: null,
+    likes: [],
+    dislikes: [],
+    subscribedVideos: [], // New state for subscribed videos
+    isSubscribed: false,
+    user: null, // New state for user info
     error: null,
     loading: false,
   },
-  reducers: {},
+  reducers: {
+    setSubscriptionStatus: (state, action) => {
+      state.isSubscribed = action.payload; // Set subscription status based on action payload
+    },
+  },
   extraReducers: (builder) => {
     builder
-      // Handle update user
-      .addCase(updateUser.pending, (state) => {
+      // Handle checking subscription
+      .addCase(checkSubscription.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(updateUser.fulfilled, (state, action) => {
+      .addCase(checkSubscription.fulfilled, (state, action) => {
+        state.isSubscribed = action.payload; // Set the subscription status
         state.loading = false;
-        state.userInfo = action.payload; // Update user info
       })
-      .addCase(updateUser.rejected, (state, action) => {
+      .addCase(checkSubscription.rejected, (state, action) => {
+        state.error = action.payload; // Set the error if the check fails
         state.loading = false;
-        state.error = action.payload;
       })
 
-      // Handle delete user
-      .addCase(deleteUser.pending, (state) => {
+      // Handle getting user information
+      .addCase(getUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(deleteUser.fulfilled, (state) => {
+      .addCase(getUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.userInfo = null; // Clear user info after deletion
+        state.user = action.payload; // Assign the retrieved user data
       })
-      .addCase(deleteUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Handle subscribe
-      .addCase(subscribe.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(subscribe.fulfilled, (state) => {
-        state.loading = false;
-        // Update state if needed (e.g., update subscribers count)
-      })
-      .addCase(subscribe.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Handle unsubscribe
-      .addCase(unsubscribe.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(unsubscribe.fulfilled, (state) => {
-        state.loading = false;
-        // Update state if needed (e.g., update subscribers count)
-      })
-      .addCase(unsubscribe.rejected, (state, action) => {
+      .addCase(getUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -174,9 +197,10 @@ const userInfoSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(likeVideo.fulfilled, (state) => {
+      .addCase(likeVideo.fulfilled, (state, action) => {
         state.loading = false;
-        // Update state if needed (e.g., update likes count)
+        state.likes = action.payload.likes || []; // Safely assign likes
+        state.dislikes = action.payload.dislikes || []; // Safely assign dislikes
       })
       .addCase(likeVideo.rejected, (state, action) => {
         state.loading = false;
@@ -188,25 +212,42 @@ const userInfoSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(dislikeVideo.fulfilled, (state) => {
+      .addCase(dislikeVideo.fulfilled, (state, action) => {
         state.loading = false;
-        // Update state if needed (e.g., update dislikes count)
+        state.likes = action.payload.likes || []; // Safely assign likes
+        state.dislikes = action.payload.dislikes || []; // Safely assign dislikes
       })
       .addCase(dislikeVideo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Handle get user
-      .addCase(getUser.pending, (state) => {
+      // Handle subscribe to video
+      .addCase(subscribeToVideo.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getUser.fulfilled, (state, action) => {
+      .addCase(subscribeToVideo.fulfilled, (state, action) => {
         state.loading = false;
-        state.userInfo = action.payload; // Set user info from response
+        // Update the subscribed videos list
+        state.subscribedVideos.push(action.payload); // Assuming action.payload is the subscribed video
       })
-      .addCase(getUser.rejected, (state, action) => {
+      .addCase(subscribeToVideo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // Handle unsubscribe from video
+      .addCase(unsubscribeFromVideo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(unsubscribeFromVideo.fulfilled, (state, action) => {
+        state.loading = false;
+        // Update the subscribed videos list by removing the unsubscribed video
+        state.subscribedVideos = state.subscribedVideos.filter(video => video.id !== action.payload.id); // Ensure action.payload contains the unsubscribed video
+      })
+      .addCase(unsubscribeFromVideo.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
@@ -214,7 +255,7 @@ const userInfoSlice = createSlice({
 });
 
 // Export actions if needed
-export const {} = userInfoSlice.actions;
+export const { setSubscriptionStatus } = videoInfoSlice.actions;
 
 // Export reducer
-export default userInfoSlice.reducer;
+export default videoInfoSlice.reducer;

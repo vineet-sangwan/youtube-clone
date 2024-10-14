@@ -14,6 +14,7 @@ const Home = ({ type }) => {
   const {
     videos = [],
     subscribedVideos = [],
+    searchResults = [], // Access search results from Redux
     isLoading,
     error,
   } = useSelector((state) => state.videos);
@@ -30,11 +31,16 @@ const Home = ({ type }) => {
   }, [dispatch, type]);
 
   // Determine which videos to display
-  const videosToDisplay = type === "Subscriptions" ? subscribedVideos : videos;
+  const videosToDisplay =
+    searchResults.length > 0
+      ? searchResults
+      : type === "Subscriptions"
+      ? subscribedVideos
+      : videos;
 
   // Conditional class for ml-10 based on type
   const containerClass = `flex flex-col h-screen bg-gray-50 p-6 ${
-    type === "trend" || type === "Subscriptions" ? "ml-10" : ""
+    type === "trend" || type === "Subscriptions" ? "ml-8" : ""
   }`;
 
   return (

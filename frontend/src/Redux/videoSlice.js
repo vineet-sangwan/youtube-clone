@@ -1,6 +1,8 @@
+// videoSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import Cookies from 'js-cookie'; // Import js-cookie
+
 // Thunks for asynchronous actions
 
 // Add a new video
@@ -64,10 +66,7 @@ export const fetchSubscribedVideos = createAsyncThunk(
   'videos/fetchSubscribedVideos',
   async (_, { rejectWithValue }) => {
     const token = Cookies.get('token'); // Retrieve token from cookies
-    console.log('Retrieved Token:', token); // Log the token to see if it’s undefined
-    console.log(document.cookie)
     if (!token) {
-      console.error('Token is not available.');
       return rejectWithValue('Token is not available');
     }
 
@@ -97,7 +96,7 @@ export const fetchVideosByTag = createAsyncThunk('videos/fetchVideosByTag', asyn
 export const searchVideos = createAsyncThunk('videos/searchVideos', async (query, { rejectWithValue }) => {
   try {
     const response = await axios.get(`http://localhost:3000/api/video/search?q=${query}`);
-    return response.data;
+    return response.data; // Ensure this matches the structure you expect
   } catch (err) {
     return rejectWithValue(err.response.data);
   }
@@ -107,8 +106,9 @@ export const searchVideos = createAsyncThunk('videos/searchVideos', async (query
 const initialState = {
   videos: [],
   currentVideo: null,
+  subscribedVideos: [],
+  searchResults: [], // Store search results here
   isLoading: false,
-  loading: false,
   error: null,
 };
 
@@ -122,17 +122,18 @@ const videoSlice = createSlice({
   extraReducers: (builder) => {
     // Get video 
     builder
-    .addCase(getVideo.pending, (state) => {
-      state.loading = true;
-    })
-    .addCase(getVideo.fulfilled, (state, action) => {
-      state.loading = false;
-      state.currentVideo = action.payload; // Ensure this matches the API response
-    })
-    .addCase(getVideo.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
-    })
+      .addCase(getVideo.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getVideo.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.currentVideo = action.payload; // Ensure this matches the API response
+      })
+      .addCase(getVideo.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message;
+      });
+
     // Add video
     builder
       .addCase(addVideo.pending, (state) => {
@@ -209,15 +210,15 @@ const videoSlice = createSlice({
     // Fetch subscribed videos
     builder
       .addCase(fetchSubscribedVideos.pending, (state) => {
-        state.loading = true;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(fetchSubscribedVideos.fulfilled, (state, action) => {
-        state.loading = false;
+        state.isLoading = false;
         state.subscribedVideos = action.payload;
       })
       .addCase(fetchSubscribedVideos.rejected, (state, action) => {
-        state.loading = false;
+        state.isLoading = false;
         state.error = action.payload; // Handle the error message from the rejected value
       });
 
@@ -242,11 +243,11 @@ const videoSlice = createSlice({
       })
       .addCase(searchVideos.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.videos = action.payload;
+        state.searchResults = action.payload; // Store search results here
       })
       .addCase(searchVideos.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload;
+        state.error = action.payload; // Handle the error message from the rejected value
       });
   },
 });
