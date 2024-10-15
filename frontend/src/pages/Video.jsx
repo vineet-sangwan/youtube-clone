@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"; // Import useState
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   FaThumbsUp,
@@ -29,43 +29,42 @@ const Video = () => {
   const videoId = currentVideo ? currentVideo._id : null;
   const userID = currentVideo ? currentVideo.userId : null;
 
-  // Local state for subscription status
   const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
-    if (userInfo && userInfo.user && userInfo.user.subscribedUsers) {
+    if (userInfo?.user?.subscribedUsers) {
       setIsSubscribed(userInfo.user.subscribedUsers.includes(userID));
     }
   }, [userInfo, userID]);
 
   useEffect(() => {
-    dispatch(getVideo(id)); // Fetch the video by ID
+    dispatch(getVideo(id));
   }, [dispatch, id]);
 
   useEffect(() => {
     if (userID) {
-      dispatch(getUser(userID)); // Fetch user data when userId changes
+      dispatch(getUser(userID));
     }
   }, [dispatch, userID]);
 
   const handleLike = async () => {
     await dispatch(likeVideo(videoId));
-    dispatch(getVideo(id)); // Refetch video to get updated likes
+    dispatch(getVideo(id));
   };
 
   const handleDislike = async () => {
     await dispatch(dislikeVideo(videoId));
-    dispatch(getVideo(id)); // Refetch video to get updated dislikes
+    dispatch(getVideo(id));
   };
 
   const handleSubscribe = async () => {
     await dispatch(subscribeToVideo(userID));
-    setIsSubscribed(true); // Update local state immediately
+    setIsSubscribed(true);
   };
 
   const handleUnsubscribe = async () => {
     await dispatch(unsubscribeFromVideo(userID));
-    setIsSubscribed(false); // Update local state immediately
+    setIsSubscribed(false);
   };
 
   if (loading) return <div>Loading...</div>;
@@ -81,10 +80,9 @@ const Video = () => {
               controls
               autoPlay
               className="w-full rounded-lg shadow-md border-2 border-gray-700 mb-4"
-              src={currentVideo.videoUrl}
+              src={currentVideo.videoUrl} // Directly using the fetched video URL
+              type="video/mp4" // Ensure correct type for the video
             >
-              <source src={currentVideo.videoUrl} type="video/mp4" />
-              <source src={currentVideo.videoUrl} type="video/webm" />
               Your browser does not support the video tag.
             </video>
           </div>
@@ -95,7 +93,7 @@ const Video = () => {
             </h2>
             <p className="text-gray-300 mb-4">{currentVideo.desc}</p>
             <span className="text-gray-500">
-              {currentVideo.views} • {format(currentVideo.createdAt)}
+              {currentVideo.views} views • {format(currentVideo.createdAt)}
             </span>
           </div>
 

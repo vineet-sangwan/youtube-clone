@@ -5,15 +5,28 @@ import Cookies from 'js-cookie'; // Import js-cookie
 
 // Thunks for asynchronous actions
 
-// Add a new video
-export const addVideo = createAsyncThunk('videos/addVideo', async (videoData, { rejectWithValue }) => {
-  try {
-    const response = await axios.post('http://localhost:3000/api/video', videoData);
-    return response.data;
-  } catch (err) {
-    return rejectWithValue(err.response.data);
+// Async thunk to add a new video with authentication
+export const addVideo = createAsyncThunk(
+  'videos/addVideo',
+  async (videoData, { rejectWithValue }) => {
+    const token = Cookies.get('token'); // Retrieve token from cookies
+    if (!token) return rejectWithValue('Token is not available');
+
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/api/video',
+        videoData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true, // Ensure cookies are sent
+        }
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
   }
-});
+);
 
 // Update an existing video
 export const updateVideo = createAsyncThunk('videos/updateVideo', async ({ id, videoData }, { rejectWithValue }) => {
@@ -134,19 +147,21 @@ const videoSlice = createSlice({
         state.error = action.error.message;
       });
 
-    // Add video
+    // Add Video
     builder
-      .addCase(addVideo.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(addVideo.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.videos.push(action.payload);
-      })
-      .addCase(addVideo.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
-      });
+    .addCase(addVideo.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    })
+    .addCase(addVideo.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.videos.push(action.payload); // Add the new video to the list
+    })
+    .addCase(addVideo.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    });
+
 
     // Update video
     builder

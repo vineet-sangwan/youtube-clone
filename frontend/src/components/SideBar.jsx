@@ -45,7 +45,13 @@ const SideBar = ({ isOpen }) => {
 
       {/* Middle Navigation */}
       <div className="space-y-2 flex flex-col">
-        <SidebarOption Icon={GrChannel} label="Your Channel" isOpen={isOpen} />
+        <Link to="/userChannel">
+          <SidebarOption
+            Icon={GrChannel}
+            label="Your Channel"
+            isOpen={isOpen}
+          />
+        </Link>
         <SidebarOption
           Icon={MdOutlineHistory}
           label="History"

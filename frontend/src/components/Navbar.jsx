@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
-import Cookies from "js-cookie"; // Import js-cookie
+import Cookies from "js-cookie";
 import { IoMenuOutline, IoSearchOutline } from "react-icons/io5";
-import { AiOutlineYoutube } from "react-icons/ai";
+import { AiOutlineYoutube, AiOutlinePlus } from "react-icons/ai"; // Import AiOutlinePlus icon
 import { MdOutlineKeyboardVoice } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import unknownUser from "../images/user.jpg";
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; // Import useDispatch and useSelector
-import { signOutUser, clearUserInfo } from "../Redux/userSlice"; // Import logout action
-import { checkAuth } from "../Redux/userSlice";
-import { searchVideos } from "../Redux/videoSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { signOutUser, clearUserInfo, checkAuth } from "../Redux/userSlice";
+import { searchVideos, addVideo } from "../Redux/videoSlice"; // Import addVideo action
 
 const Navbar = ({ toggleSidebar }) => {
   const [userPic] = useState(unknownUser);
@@ -17,9 +16,8 @@ const Navbar = ({ toggleSidebar }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Access user information from Redux store
   const dispatch = useDispatch();
-  const { userInfo, isLoading } = useSelector((state) => state.user); // Use useSelector to get user info
+  const { userInfo, isLoading } = useSelector((state) => state.user);
 
   useEffect(() => {
     dispatch(checkAuth());
@@ -28,9 +26,9 @@ const Navbar = ({ toggleSidebar }) => {
   if (isLoading) return <div>Loading...</div>;
 
   const handleLogout = async () => {
-    await dispatch(signOutUser()); // Dispatch logout action
-    dispatch(clearUserInfo()); // Clear user info from state
-    Cookies.remove("token"); // Remove token from cookies
+    await dispatch(signOutUser());
+    dispatch(clearUserInfo());
+    Cookies.remove("token");
   };
 
   const toggleDropdown = () => {
@@ -44,9 +42,27 @@ const Navbar = ({ toggleSidebar }) => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      dispatch(searchVideos(searchTerm)); // Dispatch search action
+      dispatch(searchVideos(searchTerm));
     } else {
       alert("Please enter a search term");
+    }
+  };
+
+  const handleAddVideo = async () => {
+    const token = Cookies.get("token");
+    if (!token) return alert("Please login to add a video.");
+
+    const videoData = {
+      title: "New Video", // Example video data
+      description: "This is a new video.",
+      url: "https://example.com/video.mp4",
+    };
+
+    try {
+      await dispatch(addVideo(videoData));
+      alert("Video added successfully!");
+    } catch (error) {
+      alert("Error adding video: " + error.message);
     }
   };
 
@@ -92,8 +108,18 @@ const Navbar = ({ toggleSidebar }) => {
         </form>
       </div>
 
-      {/* Right side - User and options */}
+      {/* Right side - User, Add Video, and Options */}
       <div className="flex items-center space-x-4 relative z-50">
+        {/* Add Video Button */}
+        <Link to="/upload">
+          <button
+            className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition duration-200 flex items-center justify-center"
+            onClick={handleAddVideo}
+          >
+            <AiOutlinePlus size={24} /> {/* Plus Icon Button */}
+          </button>
+        </Link>
+
         <BsThreeDotsVertical
           className="text-gray-700 cursor-pointer"
           size={24}
@@ -111,8 +137,8 @@ const Navbar = ({ toggleSidebar }) => {
         </button>
 
         {dropdownOpen && (
-          <div className="absolute top-12 right-0 w-40 bg-white shadow-lg rounded-lg p-2 ">
-            {!userInfo ? ( // Check if userInfo is available
+          <div className="absolute top-12 right-0 w-40 bg-white shadow-lg rounded-lg p-2">
+            {!userInfo ? (
               <>
                 <Link to="/login">
                   <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
@@ -133,7 +159,7 @@ const Navbar = ({ toggleSidebar }) => {
                   </button>
                 </Link>
                 <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                  {userInfo.user.name || "User"} {/* Display username */}
+                  {userInfo.user.name || "User"}
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200"
@@ -160,50 +186,6 @@ const Navbar = ({ toggleSidebar }) => {
                 <button className="bg-gray-100 p-2 rounded-r-full hover:bg-gray-200 transition duration-200">
                   <IoSearchOutline size={24} />
                 </button>
-              </div>
-
-              <div className="flex items-center justify-evenly w-full mb-4">
-                <button className="bg-gray-100 p-2 rounded-full hover:bg-gray-200 transition duration-200">
-                  <MdOutlineKeyboardVoice size={24} />
-                </button>
-                <button className="relative" onClick={toggleDropdown}>
-                  <img
-                    src={userPic}
-                    alt="User"
-                    className="w-10 h-10 rounded-full object-cover cursor-pointer border-2 border-gray-300"
-                  />
-                </button>
-              </div>
-
-              <div className="flex flex-col w-full space-y-2">
-                {!userInfo ? (
-                  <>
-                    <Link to="/login">
-                      <button className="w-full px-4 py-2 text-gray rounded-md ">
-                        Login
-                      </button>
-                    </Link>
-                    <Link to="/signup">
-                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                        Sign Up
-                      </button>
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/channel">
-                      <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                        Profile
-                      </button>
-                    </Link>
-                    <button
-                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200"
-                      onClick={handleLogout}
-                    >
-                      Logout
-                    </button>
-                  </>
-                )}
               </div>
             </div>
           </div>
