@@ -11,7 +11,7 @@ import Channel from "./pages/Channel.jsx";
 import { Provider } from "react-redux";
 import store from "./Redux/store.js";
 import VideoUpload from "./components/VideoUpload.jsx";
-import ChannelComponent from "./components/ChannelComponent.jsx";
+import ChannelComponent from "./components/Channel.jsx";
 
 const router = createBrowserRouter([
   {
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
         element: <Channel />,
       },
       {
-        path: "/userChannel",
+        path: "/userChannel/:channelId",
         element: <ChannelComponent />,
       },
       {

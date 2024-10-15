@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/users.js'; 
 import videoRoutes from './routes/videos.js'; 
 import commentRoutes from './routes/comments.js';
+import channelRoutes from './routes/channel.js'
 import authRoutes from './routes/auth.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors'; // Import cors
@@ -38,6 +39,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/video', videoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/comments', commentRoutes);
+app.use("/api/channels", channelRoutes); 
 
 // Error handling middleware
 app.use((err, req, res, next) => {
