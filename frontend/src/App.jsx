@@ -23,7 +23,7 @@ const App = () => {
         {/* Sidebar on the left with dynamic width */}
         <div
           className={`transition-all duration-300 bg-white shadow-lg ${
-            sidebarOpen ? "w-56 md:w-64" : "w-20 md:w-16"
+            sidebarOpen ? "w-56 md:w-20" : "w-20 md:w-16"
           } h-full`}
         >
           <SideBar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
