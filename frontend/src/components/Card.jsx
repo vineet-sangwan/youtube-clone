@@ -26,7 +26,7 @@ const VideoCard = ({ video }) => {
         <img
           src={video.imgUrl} // Use imgUrl from your video data
           alt={video.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-48 object-cover" // Thumbnail styling
         />
 
         {/* Video Info */}
@@ -45,8 +45,10 @@ const VideoCard = ({ video }) => {
             <p className="text-sm text-gray-800">{video.name}</p>{" "}
             {/* Display username as channel name */}
           </div>
-          <p className="text-xs text-gray-500 mt-2">{video.desc}</p>{" "}
-          {/* Display description */}
+          <p className="text-xs text-gray-500 mt-2 line-clamp-3">
+            {video.desc}
+          </p>{" "}
+          {/* Display description with clamping */}
         </div>
       </div>
     </Link>

@@ -57,6 +57,27 @@ export const getVideo = async (req, res, next) => {
   }
 };
 
+export const getVideosByUser = async (req, res, next) => {
+  try {
+    const userId = req.user.id; // Assuming req.user contains the logged-in user's data
+    console.log("User ID:", userId);
+
+    // Fetch all videos that belong to the logged-in user
+    const videos = await Video.find({ userId: userId });
+
+    if (!videos || videos.length === 0) {
+      return res.status(404).json({ message: "No videos found for this user." });
+    }
+
+    // Return the list of videos
+    res.status(200).json(videos);
+  } catch (err) {
+    console.error("Error fetching videos:", err);
+    next(err);
+  }
+};
+
+
 export const addView = async (req, res, next) => {
   try {
     await Video.findByIdAndUpdate(req.params.id, {

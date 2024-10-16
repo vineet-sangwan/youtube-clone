@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addVideo } from "../Redux/videoSlice"; // Import the action
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,11 @@ const VideoUpload = () => {
   const [tags, setTags] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Accessing user information from the Redux state
+  const user = useSelector((state) => state.user.userInfo); // Correctly accessing userInfo
+  const userId = user ? user.user._id : null; // Ensure userId is set correctly
+  console.log(userId);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -19,16 +24,16 @@ const VideoUpload = () => {
     e.preventDefault();
 
     // Make sure all fields are filled
-    if (!title || !desc || !imgUrl || !videoUrl || !tags) {
+    if (!title || !desc || !imgUrl || !videoUrl || !tags || !userId) {
       return alert("Please fill in all fields.");
     }
-
     const videoData = {
       title,
       desc,
       imgUrl,
       videoUrl,
       tags: tags.split(",").map((tag) => tag.trim()), // Convert tags to array
+      user: userId,
     };
 
     const token = Cookies.get("token");

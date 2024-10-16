@@ -48,11 +48,29 @@ export const deleteVideo = createAsyncThunk('videos/deleteVideo', async (id, { r
   }
 });
 
-// Get a single video
-export const getVideo = createAsyncThunk("videos/getVideo", async (id) => {
-  const response = await axios.get(`http://localhost:3000/api/video/find/${id}`); // Adjust the endpoint as needed
-  return response.data; // Ensure this matches the structure you expect
-});
+// Async Thunk to fetch videos by logged-in user (userId passed as an argument)
+export const fetchVideosByUser = createAsyncThunk(
+  'videos/fetchVideosByUser',
+  async (userId, { rejectWithValue }) => {
+    const token = Cookies.get('token'); // Retrieve token from cookies
+    if (!token) {
+      return rejectWithValue('Token is not available');
+    }
+
+    try {
+      // Make an authenticated API request to fetch videos for the given userId
+      const response = await axios.get(`http://localhost:3000/api/video/find/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true, // Ensure cookies are sent with requests
+      });
+      return response.data; // Return the videos data
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      return rejectWithValue(error.response.data); // Return the error if any
+    }
+  }
+);
+
 
 // Fetch random videos
 export const fetchRandomVideos = createAsyncThunk('videos/fetchRandomVideos', async (_, { rejectWithValue }) => {
@@ -72,6 +90,12 @@ export const fetchTrendingVideos = createAsyncThunk('videos/fetchTrendingVideos'
   } catch (err) {
     return rejectWithValue(err.response.data);
   }
+});
+
+// Get a single video
+export const getVideo = createAsyncThunk("videos/getVideo", async (id) => {
+  const response = await axios.get(`http://localhost:3000/api/video/findVideo/${id}`); // Adjust the endpoint as needed
+  return response.data; // Ensure this matches the structure you expect
 });
 
 // Async thunk for fetching videos from subscribed channels
@@ -115,9 +139,11 @@ export const searchVideos = createAsyncThunk('videos/searchVideos', async (query
   }
 });
 
+
 // Initial state
 const initialState = {
   videos: [],
+  userVideos: [],
   currentVideo: null,
   subscribedVideos: [],
   searchResults: [], // Store search results here
@@ -133,18 +159,18 @@ const videoSlice = createSlice({
     // You can add synchronous reducers if needed
   },
   extraReducers: (builder) => {
-    // Get video 
     builder
-      .addCase(getVideo.pending, (state) => {
+      .addCase(fetchVideosByUser.pending, (state) => {
         state.isLoading = true;
+        state.error = null; // Clear previous errors
       })
-      .addCase(getVideo.fulfilled, (state, action) => {
+      .addCase(fetchVideosByUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.currentVideo = action.payload; // Ensure this matches the API response
+        state.userVideos = action.payload; // Store the fetched user-specific videos in userVideos
       })
-      .addCase(getVideo.rejected, (state, action) => {
+      .addCase(fetchVideosByUser.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message;
+        state.error = action.payload; // Store the error message
       });
 
     // Add Video
@@ -264,6 +290,19 @@ const videoSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload; // Handle the error message from the rejected value
       });
+        // Get video 
+    builder
+    .addCase(getVideo.pending, (state) => {
+      state.isLoading = true;
+    })
+    .addCase(getVideo.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.currentVideo = action.payload; // Ensure this matches the API response
+    })
+    .addCase(getVideo.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.error.message;
+    });
   },
 });
 

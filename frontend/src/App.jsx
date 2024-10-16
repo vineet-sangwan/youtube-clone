@@ -22,24 +22,23 @@ const App = () => {
       <div className="flex flex-grow mt-16 overflow-hidden">
         {/* Sidebar on the left with dynamic width */}
         <div
-          className={`transition-all duration-300 ${
-            sidebarOpen ? "w-56" : "w-16"
-          }`}
+          className={`transition-all duration-300 bg-white shadow-lg ${
+            sidebarOpen ? "w-56 md:w-64" : "w-20 md:w-16"
+          } h-full`}
         >
           <SideBar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         </div>
 
         {/* Main content area where routes will be rendered */}
         <div
-          className={`flex-grow transition-all duration-300  ${
-            sidebarOpen
-              ? "ml-2 lg:ml-1 lg:mt-4"
-              : isHomePage
-              ? " lg:ml-1"
-              : " mt-2"
-          } overflow-auto`}
+          className={`flex-grow transition-all duration-300 bg-white shadow-md p-4 ${
+            sidebarOpen ? "ml-4 md:ml-40" : "ml-5 md:ml-4"
+          } overflow-auto rounded-lg`}
         >
-          <Outlet /> {/* This renders the specific route content */}
+          {/* Container for content */}
+          <div className="max-w-8xl mx-auto px-4">
+            <Outlet /> {/* This renders the specific route content */}
+          </div>
         </div>
       </div>
     </div>

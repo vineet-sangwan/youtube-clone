@@ -18,6 +18,7 @@ import {
 import { getVideo } from "../Redux/videoSlice.js";
 import { useParams } from "react-router-dom";
 import { format } from "timeago.js";
+import ReactPlayer from "react-player";
 
 const Video = () => {
   const dispatch = useDispatch();
@@ -76,15 +77,15 @@ const Video = () => {
       <div className="flex flex-col items-center p-4 w-full lg:w-[60%] lg:max-w-[875px] mx-auto">
         <div className="videoPostSection w-full bg-gray-800 rounded-lg shadow-lg mb-4">
           <div className="video_youtube">
-            <video
-              controls
-              autoPlay
-              className="w-full rounded-lg shadow-md border-2 border-gray-700 mb-4"
-              src={currentVideo.videoUrl} // Directly using the fetched video URL
-              type="video/mp4" // Ensure correct type for the video
-            >
-              Your browser does not support the video tag.
-            </video>
+            {/* ReactPlayer for advanced video playback */}
+            <ReactPlayer
+              url={currentVideo.videoUrl} // The video URL from your state or props
+              controls={true} // Show play/pause controls
+              playing={true} // Auto-play video
+              className="w-full rounded-lg shadow-md border-2 border-gray-700 mb-4" // Tailwind styling
+              width="100%" // Full width
+              height="auto" // Auto-adjust height based on aspect ratio
+            />
           </div>
 
           <div className="p-4">
