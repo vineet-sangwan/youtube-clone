@@ -1,38 +1,33 @@
 import mongoose from "mongoose";
 
-const ChannelSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const ChannelSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    profileImage: {
+      type: String,
+    },
+    bannerImage: {
+      type: String,
+    },
+    subscribers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  profileImage: {
-    type: String, // URL or path to the profile picture
-    required: true,
-  },
-  bannerImage: {
-    type: String, // URL or path to the banner image
-    required: false, // Optional
-  },
-  subscribers: {
-    type: Number,
-    default: 0, // Default is 0 subscribers when a channel is created
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }
+);
 
-const Channel = mongoose.model("Channel", ChannelSchema);
-
-export default Channel;
+export default mongoose.model("Channel", ChannelSchema);

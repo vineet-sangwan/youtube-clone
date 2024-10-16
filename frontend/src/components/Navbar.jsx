@@ -159,7 +159,7 @@ const Navbar = ({ toggleSidebar }) => {
                   </button>
                 </Link>
                 <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200">
-                  {userInfo.user.name || "User"}
+                  {userInfo?.user?.name || "User"}
                 </button>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 transition duration-200"

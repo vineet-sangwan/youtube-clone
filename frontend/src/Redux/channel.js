@@ -25,11 +25,15 @@ export const addChannel = createAsyncThunk(
       });
       return response.data;
     } catch (err) {
+      if (err.response.data === "You can only create one channel.") {
+        alert("You have already created a channel.");
+      }
       return rejectWithValue(err.response.data);
     }
   }
 );
 
+// Async thunk to update a channel
 export const updateChannel = createAsyncThunk(
   'channels/updateChannel',
   async ({ id, channelData }, { rejectWithValue }) => {
@@ -48,6 +52,7 @@ export const updateChannel = createAsyncThunk(
   }
 );
 
+// Async thunk to delete a channel
 export const deleteChannel = createAsyncThunk(
   'channels/deleteChannel',
   async (id, { rejectWithValue, getState }) => {
@@ -69,7 +74,7 @@ export const deleteChannel = createAsyncThunk(
   }
 );
 
-// Fetch all channels
+// Async thunk to fetch all channels
 export const fetchChannels = createAsyncThunk(
   'channels/fetchChannels',
   async (_, { rejectWithValue }) => {
@@ -102,10 +107,56 @@ export const fetchChannelById = createAsyncThunk(
   }
 );
 
+// Async thunk to subscribe to a channel
+export const subscribeToChannel = createAsyncThunk(
+  'subscription/subscribeToChannel',
+  async (channelId, { rejectWithValue }) => {
+    const token = Cookies.get('token'); // Retrieve token from cookies
+    if (!token) return rejectWithValue('Token is not available');
+
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/api/channels/${channelId}/subscribe`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      return response.data; // Return the response data
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
+
+// Async thunk to unsubscribe from a channel
+export const unsubscribeFromChannel = createAsyncThunk(
+  'subscription/unsubscribeFromChannel',
+  async (channelId, { rejectWithValue }) => {
+    const token = Cookies.get('token'); // Retrieve token from cookies
+    if (!token) return rejectWithValue('Token is not available');
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:3000/api/channels/${channelId}/unsubscribe`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
+      );
+      return response.data; // Return the response data
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
+
 // Initial state
 const initialState = {
   channels: [],
-  currentChannel: null, // Updated to match the property being set in the fulfilled case
+  currentChannel: {  }, // Initialize isSubscribed
+  isSubscribed: false,
   isLoading: false,
   error: null,
 };
@@ -115,7 +166,9 @@ const channelSlice = createSlice({
   name: 'channels',
   initialState,
   reducers: {
-    // You can add synchronous reducers if needed
+    reset: (state) => {
+      state.error = null;
+    },
   },
   extraReducers: (builder) => {
     // Fetch channels
@@ -193,8 +246,32 @@ const channelSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload || "An error occurred";
       });
-  },
-});
 
-// Export the reducer
-export default channelSlice.reducer;
+    // Subscribe to channel
+    builder
+      .addCase(subscribeToChannel.fulfilled, (state, action) => {
+        state.currentChannel.isSubscribed = true; // Set isSubscribed to true
+        // Optionally update the channel in the channels array
+        const channelIndex = state.channels.findIndex(channel => channel.id === action.payload.id);
+        if (channelIndex !== -1) {
+          state.channels[channelIndex] = { ...state.channels[channelIndex], ...action.payload };
+        }
+      });
+
+    // Unsubscribe from channel
+    builder
+      .addCase(unsubscribeFromChannel.fulfilled, (state, action) => {
+        state.currentChannel.isSubscribed = false; // Set isSubscribed to false
+        // Optionally update the channel in the channels array
+        const channelIndex = state.channels.findIndex(channel => channel.id === action.payload.id);
+          if (channelIndex !== -1) {
+            state.channels[channelIndex] = { ...state.channels[channelIndex], ...action.payload };
+          }
+        });
+    },
+  });
+  
+  // Export actions and reducer
+  export const { reset } = channelSlice.actions;
+  export default channelSlice.reducer;
+  

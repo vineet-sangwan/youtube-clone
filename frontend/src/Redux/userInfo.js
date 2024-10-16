@@ -153,7 +153,7 @@ const videoInfoSlice = createSlice({
     dislikes: [],
     subscribedVideos: [], // New state for subscribed videos
     isSubscribed: false,
-    user: null, // New state for user info
+    user: {}, // New state for user info
     error: null,
     loading: false,
   },

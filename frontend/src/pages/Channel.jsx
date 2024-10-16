@@ -9,10 +9,9 @@ const ChannelComponent = () => {
   const { channels, isLoading, error } = useSelector((state) => state.channels); // Get channels from Redux store
   const [showForm, setShowForm] = useState(false);
   const [channelName, setChannelName] = useState("");
-  const [bgImage, setBgImage] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [bannerImage, setBannerImage] = useState(""); // New state for banner image
   const [description, setDescription] = useState("");
-  const [subscribers, setSubscribers] = useState(0); // New state for subscribers
 
   useEffect(() => {
     // Fetch existing channels when the component mounts
@@ -28,9 +27,9 @@ const ChannelComponent = () => {
       userId: userInfo._id, // Access userId from userInfo
       name: channelName,
       description,
-      profileImage: bgImage, // Assuming bgImage is used as profileImage
+      profileImage, // Use profileImage for channel profile
       bannerImage, // Add bannerImage field
-      subscribers, // Add subscribers field
+      subscribers: [], // Initialize subscribers as an empty array
     };
 
     // Dispatch action to add the new channel
@@ -39,10 +38,9 @@ const ChannelComponent = () => {
       .then(() => {
         // Clear form fields and hide form after successful creation
         setChannelName("");
-        setBgImage("");
+        setProfileImage("");
         setBannerImage(""); // Clear banner image input
         setDescription("");
-        setSubscribers(0); // Reset subscribers to 0
         setShowForm(false);
       })
       .catch((err) => {
@@ -100,8 +98,8 @@ const ChannelComponent = () => {
             <input
               type="text"
               placeholder="Enter Profile Image URL"
-              value={bgImage}
-              onChange={(e) => setBgImage(e.target.value)}
+              value={profileImage}
+              onChange={(e) => setProfileImage(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               required
             />
@@ -129,22 +127,6 @@ const ChannelComponent = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-
-          {/* New Subscribers Input Field */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Subscribers
-            </label>
-            <input
-              type="number"
-              placeholder="Enter Number of Subscribers"
-              value={subscribers}
-              onChange={(e) => setSubscribers(Number(e.target.value))}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              min="0"
               required
             />
           </div>
@@ -178,7 +160,7 @@ const ChannelComponent = () => {
                   <h3 className="text-xl font-semibold">{channel.name}</h3>
                   <p className="text-gray-600">{channel.description}</p>
                   <p className="text-gray-500">
-                    Subscribers: {channel.subscribers}
+                    Subscribers: {channel.subscribers.length}
                   </p>
                 </div>
               </NavLink>

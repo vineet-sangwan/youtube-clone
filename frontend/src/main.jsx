@@ -12,7 +12,6 @@ import { Provider } from "react-redux";
 import store from "./Redux/store.js";
 import VideoUpload from "./components/VideoUpload.jsx";
 import ChannelComponent from "./components/Channel.jsx";
-
 const router = createBrowserRouter([
   {
     path: "/",

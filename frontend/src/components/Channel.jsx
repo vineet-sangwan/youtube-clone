@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchChannelById, updateChannel } from "../Redux/channel";
 import {
-  subscribeToVideo,
-  unsubscribeFromVideo,
-  checkSubscription,
-} from "../Redux/userInfo";
-import Cookies from "js-cookie";
+  fetchChannelById,
+  updateChannel,
+  subscribeToChannel,
+  unsubscribeFromChannel,
+} from "../Redux/channel"; // Adjusted imports
 
 const ChannelComponent = () => {
   const { channelId } = useParams();
   const dispatch = useDispatch();
   const channels = useSelector((state) => state.channels);
-  const user = useSelector((state) => state.videoInfo);
   const { currentChannel, isLoading, error } = channels;
-  const isSubscribed = useSelector((state) => state.videoInfo.isSubscribed);
 
   const [name, setName] = useState(currentChannel?.name || "");
   const [bannerImage, setBannerImage] = useState(
@@ -24,14 +21,12 @@ const ChannelComponent = () => {
   const [profileImage, setProfileImage] = useState(
     currentChannel?.profileImage || ""
   );
-
-  // State for toggling the update form visibility
   const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
     if (channelId) {
       dispatch(fetchChannelById(channelId));
-      dispatch(checkSubscription(channelId));
     }
   }, [channelId, dispatch]);
 
@@ -40,26 +35,10 @@ const ChannelComponent = () => {
       setName(currentChannel.name);
       setBannerImage(currentChannel.bannerImage);
       setProfileImage(currentChannel.profileImage);
+      // Replace "userId" with actual user ID
+      setIsSubscribed(currentChannel.subscribers?.includes("userId"));
     }
   }, [currentChannel]);
-
-  const handleSubscribe = async () => {
-    if (user) {
-      const response = await dispatch(subscribeToVideo(currentChannel._id));
-      if (response.payload.success) {
-        dispatch(checkSubscription(channelId));
-      }
-    }
-  };
-
-  const handleUnsubscribe = async () => {
-    if (user) {
-      const response = await dispatch(unsubscribeFromVideo(currentChannel._id));
-      if (response.payload.success) {
-        dispatch(checkSubscription(channelId));
-      }
-    }
-  };
 
   const handleUpdateChannel = async (e) => {
     e.preventDefault();
@@ -71,8 +50,25 @@ const ChannelComponent = () => {
       console.error("Update failed:", response.error);
     } else {
       console.log("Update successful:", response.payload);
-      setShowUpdateForm(false); // Hide the form after successful update
+      dispatch(fetchChannelById(channelId)); // Refresh channel data after updating
+      setShowUpdateForm(false);
     }
+  };
+
+  const handleSubscribe = async () => {
+    const response = await dispatch(subscribeToChannel(channelId));
+    if (!response.error) {
+      setIsSubscribed(true); // Update subscription state on success
+    }
+    dispatch(fetchChannelById(channelId)); // Refresh channel data after subscribing
+  };
+
+  const handleUnsubscribe = async () => {
+    const response = await dispatch(unsubscribeFromChannel(channelId));
+    if (!response.error) {
+      setIsSubscribed(false); // Update subscription state on success
+    }
+    dispatch(fetchChannelById(channelId)); // Refresh channel data after unsubscribing
   };
 
   if (isLoading) return <div>Loading...</div>;
@@ -93,7 +89,7 @@ const ChannelComponent = () => {
           />
         </div>
         <div className="relative z-10 text-white text-2xl md:text-4xl font-bold text-center">
-          {currentChannel?.name || "Internshala"}
+          {currentChannel?.name || "Channel Name"}
         </div>
       </div>
 
@@ -109,23 +105,35 @@ const ChannelComponent = () => {
           />
           <div className="text-center md:text-left">
             <h2 className="text-xl md:text-2xl font-bold">
-              {currentChannel?.name || "Internshala"}
+              {currentChannel?.name || "Channel Name"}
             </h2>
             <p className="text-gray-600">
-              {`${currentChannel?.subscribers || "0"} subscribers • ${
+              {`${currentChannel?.subscribers?.length || "0"} subscribers • ${
                 currentChannel?.videos?.length || "0"
               } videos`}
             </p>
+            {/* Subscribe/Unsubscribe Button */}
+            {currentChannel?.subscribers?.length > 0 ? (
+              <button
+                onClick={handleUnsubscribe}
+                className="mt-2 bg-red-500 text-white px-4 py-2 rounded"
+              >
+                Unsubscribe
+              </button>
+            ) : (
+              <button
+                onClick={handleSubscribe}
+                className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Subscribe
+              </button>
+            )}
+            {/* Channel Description */}
+            <p className="mt-2 text-gray-700">
+              {currentChannel?.description || "No description available."}
+            </p>
           </div>
         </div>
-        <button
-          onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
-          className={`px-4 py-2 rounded ${
-            isSubscribed ? "bg-red-500" : "bg-blue-500"
-          } text-white`}
-        >
-          {isSubscribed ? "Unsubscribe" : "Subscribe"}
-        </button>
       </div>
 
       {/* Update Channel Button */}
@@ -218,20 +226,19 @@ const ChannelComponent = () => {
             key={video._id}
             className="bg-white shadow-md rounded overflow-hidden"
           >
+            {/* Video Thumbnail */}
             <div
               style={{
                 backgroundImage: `url(${
-                  video.bgImage || "https://via.placeholder.com/200"
+                  video.bgImage || "https://via.placeholder.com/300x200"
                 })`,
-                height: "200px",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
               }}
-              className="w-full h-32 object-cover"
+              className="bg-cover bg-center h-40"
             ></div>
+            {/* Video Info */}
             <div className="p-4">
-              <h3 className="text-xl font-semibold">{video.name}</h3>
-              <p className="text-gray-600">{video.description}</p>
+              <h3 className="text-lg font-semibold">{video.title}</h3>
+              <p className="text-gray-600">{video.views} views</p>
             </div>
           </div>
         ))}
