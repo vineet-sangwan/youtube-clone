@@ -34,7 +34,7 @@ Clone the repository:
 
 bash
 Copy code
-git clone https://github.com/yourusername/youtubeclone.git
+git clone (https://github.com/vineet-sangwan/youtube-clone.git)
 Navigate to the project folder:
 
 bash
