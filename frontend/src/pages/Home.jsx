@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import Filter from "../components/Filter";
 import VideoCard from "../components/Card";
+import "../App.css";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchRandomVideos,
@@ -64,8 +65,9 @@ const Home = ({ type }) => {
       {/* Filter section */}
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Filter by Tags</h2>
-        <Filter tags={uniqueTags} onTagClick={handleTagClick} />{" "}
-        {/* Pass the handler */}
+        <div className="flex overflow-x-auto space-x-4 scrollbar-hide">
+          <Filter tags={uniqueTags} onTagClick={handleTagClick} />
+        </div>
       </div>
 
       {/* Loading and Error handling */}

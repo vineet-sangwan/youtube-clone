@@ -39,14 +39,26 @@ export const updateVideo = createAsyncThunk('videos/updateVideo', async ({ id, v
 });
 
 // Delete a video
-export const deleteVideo = createAsyncThunk('videos/deleteVideo', async (id, { rejectWithValue }) => {
-  try {
-    await axios.delete(`http://localhost:3000/api/video/${id}`);
-    return id; // Return the video id that was deleted
-  } catch (err) {
-    return rejectWithValue(err.response.data);
+export const deleteVideo = createAsyncThunk(
+  'videos/deleteVideo',
+  async (id, { rejectWithValue }) => {
+    const token = Cookies.get('token'); // Retrieve token from cookies
+    if (!token) {
+      return rejectWithValue('Token is not available'); // Handle missing token
+    }
+
+    try {
+      await axios.delete(`http://localhost:3000/api/video/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+        withCredentials: true, // Ensure cookies are sent with requests
+      });
+      return id; // Return the video id that was deleted
+    } catch (err) {
+      console.error("Error deleting video:", err);
+      return rejectWithValue(err.response.data); // Return the error if any
+    }
   }
-});
+);
 
 // Async Thunk to fetch videos by logged-in user (userId passed as an argument)
 export const fetchVideosByUser = createAsyncThunk(
